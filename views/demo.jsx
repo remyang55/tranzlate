@@ -1,3 +1,7 @@
+/**
+ * Modified by Rem Yang, Aug 13 2020
+ */
+
 /* eslint no-param-reassign: 0 */
 import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
@@ -15,6 +19,8 @@ import TimingView from './timing.jsx';
 import JSONView from './json-view.jsx';
 import samples from '../src/data/samples.json';
 import cachedModels from '../src/data/models.json';
+import { LanguageDropdown } from './language-dropdown.jsx';
+import ZoomMeeting from './zoom-meeting.jsx';
 
 const ERR_MIC_NARROWBAND = 'Microphone transcription cannot accommodate narrowband voice models, please select a broadband one.';
 
@@ -23,6 +29,7 @@ export class Demo extends Component {
     super();
     this.state = {
       model: 'en-US_BroadbandModel',
+      targetLanguage: 'af',
       rawMessages: [],
       formattedMessages: [],
       audioSource: null,
@@ -37,6 +44,7 @@ export class Demo extends Component {
         speakerLabels: false,
       },
       error: null,
+      meetingId: null
     };
 
     this.handleSampleClick = this.handleSampleClick.bind(this);
@@ -67,6 +75,8 @@ export class Demo extends Component {
     this.getCurrentInterimResult = this.getCurrentInterimResult.bind(this);
     this.getFinalAndLatestInterimResult = this.getFinalAndLatestInterimResult.bind(this);
     this.handleError = this.handleError.bind(this);
+    this.handleTargetLanguageChange = this.handleTargetLanguageChange.bind(this);
+    this.handleMeetingIdSubmit = this.handleMeetingIdSubmit.bind(this);
   }
 
   reset() {
@@ -318,7 +328,7 @@ export class Demo extends Component {
     this.setState({
       model,
       keywords: this.getKeywords(model),
-      speakerLabels: this.supportsSpeakerLabels(model),
+      speakerLabels: false // : this.supportsSpeakerLabels(model),
     });
 
     // clear the microphone narrowband error if it's visible and a broadband model was just selected
@@ -345,6 +355,16 @@ export class Demo extends Component {
 
   handleKeywordsChange(e) {
     this.setState({ keywords: e.target.value });
+  }
+
+  handleTargetLanguageChange(e) {
+    this.setState({ targetLanguage: e.target.value });
+  }
+
+  handleMeetingIdSubmit(e) {
+    e.preventDefault();  // prevents page from refreshing
+    const form = e.currentTarget;
+    this.setState({ meetingId: form.formMeetingId.value });
   }
 
   // cleans up the keywords string into an array of individual, trimmed, non-empty keywords/phrases
@@ -374,6 +394,7 @@ export class Demo extends Component {
     if (!r || !r.results || !r.results.length || r.results[0].final) {
       return null;
     }
+
     return r;
   }
 
@@ -435,6 +456,48 @@ export class Demo extends Component {
     const micBullet = (typeof window !== 'undefined' && recognizeMicrophone.isSupported)
       ? <li className="base--li">Use your microphone to record audio. For best results, use broadband models for microphone input.</li>
       : <li className="base--li base--p_light">Use your microphone to record audio. (Not supported in current browser)</li>;// eslint-disable-line
+    
+    const appTitle = (!this.state.meetingId) ? <h2 className="base--h2">Tranzlate: The Zoom Translator</h2> : null;  // hide title once user enters zoom meeting
+
+    const translationPanel = (this.state.meetingId)
+      ? (
+        <div>
+          <Tabs selected={0}>
+            <Pane label="Translated Transcript">
+              {settingsAtStreamStart.speakerLabels
+                ? <SpeakersView messages={messages} />
+                : <Transcript apiKey={this.state.googleTranslateApiKey} messages={messages} targetLang={this.state.targetLanguage} />}
+            </Pane>
+          </Tabs>
+          
+          <div className="flex setup">
+            <div className="column">
+              <p>Speaker Voice:
+                <ModelDropdown
+                  model={model}
+                  token={token || accessToken}
+                  onChange={this.handleModelChange}
+                />
+              </p>
+            </div>
+            <div className="column">
+              <p>Translate to:
+                <LanguageDropdown
+                  apiKey={this.state.googleTranslateApiKey}
+                  onChange={this.handleTargetLanguageChange}
+                />
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <button type="button" className={micButtonClass} onClick={this.handleMicClick}>
+              <Icon type={audioSource === 'mic' ? 'stop' : 'microphone'} fill={micIconFill} /> Start Transcribing / Translating
+            </button>
+          </div>
+        </div>
+      )
+      : null;
 
     return (
       <Dropzone
@@ -450,7 +513,7 @@ export class Demo extends Component {
           this.dropzone = node;
         }}
       >
-
+        
         <div className="drop-info-container">
           <div className="drop-info">
             <h1>Drop an audio file here.</h1>
@@ -460,8 +523,9 @@ export class Demo extends Component {
           </div>
         </div>
 
-        <h2 className="base--h2">Transcribe Audio</h2>
+        {appTitle}
 
+        {/*
         <ul className="base--ul">
           {micBullet}
           <li className="base--li">Upload pre-recorded audio (.mp3, .mpeg, .wav, .flac, or .opus only).</li>
@@ -483,90 +547,13 @@ export class Demo extends Component {
           and <a className="base--a" href="https://cloud.ibm.com/docs/speech-to-text?topic=speech-to-text-output#keyword_spotting">spotted keywords</a>. {' '}
           Some models can <a className="base--a" href="https://cloud.ibm.com/docs/speech-to-text?topic=speech-to-text-output#speaker_labels">detect multiple speakers</a>; this may slow down performance.
         </div>
-        <div className="flex setup">
-          <div className="column">
+        */}
 
-            <p>Voice Model:
-              <ModelDropdown
-                model={model}
-                token={token || accessToken}
-                onChange={this.handleModelChange}
-              />
-            </p>
-
-            <p className={this.supportsSpeakerLabels() ? 'base--p' : 'base--p_light'}>
-              <input
-                className="base--checkbox"
-                type="checkbox"
-                checked={speakerLabels}
-                onChange={this.handleSpeakerLabelsChange}
-                disabled={!this.supportsSpeakerLabels()}
-                id="speaker-labels"
-              />
-              <label className="base--inline-label" htmlFor="speaker-labels">
-                Detect multiple speakers {this.supportsSpeakerLabels() ? '' : ' (Not supported on current model)'}
-              </label>
-            </p>
-
-          </div>
-          <div className="column">
-
-            <p>Keywords to spot: <input
-              value={this.getKeywordsArrUnique().join()}
-              onChange={this.handleKeywordsChange}
-              type="text"
-              id="keywords"
-              placeholder="Type comma separated keywords here (optional)"
-              className="base--input"
-            />
-            </p>
-
-          </div>
-        </div>
-
-
-        <div className="flex buttons">
-
-          <button type="button" className={micButtonClass} onClick={this.handleMicClick}>
-            <Icon type={audioSource === 'mic' ? 'stop' : 'microphone'} fill={micIconFill} /> Record Audio
-          </button>
-
-          <button type="button" className={buttonClass} onClick={this.handleUploadClick}>
-            <Icon type={audioSource === 'upload' ? 'stop' : 'upload'} /> Upload Audio File
-          </button>
-
-          <button type="button" className={buttonClass} onClick={this.handleSample1Click}>
-            <Icon type={audioSource === 'sample-1' ? 'stop' : 'play'} /> Play Sample 1
-          </button>
-
-          <button type="button" className={buttonClass} onClick={this.handleSample2Click}>
-            <Icon type={audioSource === 'sample-2' ? 'stop' : 'play'} /> Play Sample 2
-          </button>
-
-        </div>
+        <ZoomMeeting meetingId={this.state.meetingId} handleMeetingIdSubmit={this.handleMeetingIdSubmit} />
+        
+        {translationPanel}
 
         {err}
-
-        <Tabs selected={0}>
-          <Pane label="Text">
-            {settingsAtStreamStart.speakerLabels
-              ? <SpeakersView messages={messages} />
-              : <Transcript messages={messages} />}
-          </Pane>
-          <Pane label="Word Timings and Alternatives">
-            <TimingView messages={messages} />
-          </Pane>
-          <Pane label={`Keywords ${getKeywordsSummary(settingsAtStreamStart.keywords, messages)}`}>
-            <Keywords
-              messages={messages}
-              keywords={settingsAtStreamStart.keywords}
-              isInProgress={!!audioSource}
-            />
-          </Pane>
-          <Pane label="JSON">
-            <JSONView raw={rawMessages} formatted={formattedMessages} />
-          </Pane>
-        </Tabs>
       </Dropzone>
     );
   }

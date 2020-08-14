@@ -1,46 +1,45 @@
-<h1 align="center" style="border-bottom: none;">🎤 Speech to Text Demo </h1>
-<h3 align="center">Node.js sample applications that shows some of the the IBM Watson Speech to Text service features.</h3>
-<p align="center">
-  <a href="http://travis-ci.org/watson-developer-cloud/speech-to-text-nodejs">
-    <img alt="Travis" src="https://travis-ci.org/watson-developer-cloud/speech-to-text-nodejs.svg?branch=master">
-  </a>
-  <a href="#badge">
-    <img alt="semantic-release" src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg">
-  </a>
-</p>
-</p>
-
-The [Speech to Text][service_url] service uses IBM's speech recognition capabilities to convert speech in multiple languages into text. The transcription of incoming audio is continuously sent back to the client with minimal delay, and it is corrected as more speech is heard. The service is accessed via a WebSocket interface; a REST HTTP interface is also available;
-
-You can view a [demo][demo_url] of this app.
+# :jp::us::fr: Tranzlate: The Zoom Translator :cn::es::de:
+Currently, many classes, meetings, talks, and academic conferences (CVPR and PLDI this summer are two I'm aware of) around the world are being conducted online via Zoom due to the COVID-19 pandemic. Previously, people around the world would have had to travel for many of these events, but they now have access to these resources due to their virtual nature. 
+A major barrier, however, is language. For instance, a person from the U.S. may have always wanted to attend an annual French conference. Yet, even though it's now conducted on Zoom, that person still cannot attend because he/she does not understand French. This is where Tranzlate comes in.
+The user interface is minimalistic, with a Zoom meeting screen on top and the translated text on the bottom. It is also easy to use: simply enter your meeting ID, select the speaker's language and the language you'd like to translate to, and you are all set.
 
 ## Prerequisites
+This app uses the IBM Watson Speech to Text API and the Google Translate API, so you would need these appropriate API keys. Optionally, you may also install a virtual audio device software.
 
-1. Sign up for an [IBM Cloud account](https://cloud.ibm.com/registration/).
-1. Download the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli?topic=cloud-cli-getting-started#overview).
-1. Create an instance of the Speech to Text service and get your credentials:
-    - Go to the [Speech to Text](https://cloud.ibm.com/catalog/services/speech-to-text) page in the IBM Cloud Catalog.
-    - Log in to your IBM Cloud account.
-    - Click **Create**.
-    - Click **Show** to view the service credentials.
-    - Copy the `apikey` value.
-    - Copy the `url` value.
+**IBM Cloud**
+1. Sign up for an [IBM Cloud account](https://cloud.ibm.com/registration/)
+2. Download the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli?topic=cloud-cli-getting-started#overview)
+3. Create an instance of the Speech to Text service and get your credentials:
+    - Go to the [Speech to Text](https://cloud.ibm.com/catalog/services/speech-to-text) page in the IBM Cloud Catalog
+    - Log in to your IBM Cloud account
+    - Click **Create**
+    - Click **Show** to view the service credentials
+    - Copy the `apikey` and `url` values
 
-## Configuring the application
+**Google Cloud**
+1. Sign up for a [Google Cloud account](https://cloud.google.com/) 
+2. Create a project via the [Google Cloud console](https://console.cloud.google.com/)
+3. Enable the Translation API in your project and [create an API key](https://console.cloud.google.com/apis/credentials)
 
-1. In the application folder, copy the *.env.example* file and create a file called *.env*
+**Virtual Audio Device (optional, see "Using the application" below)**
+- Windows and Mac OS: [VB-Cable](https://www.vb-audio.com/Cable/index.htm)
+- Linux: [PulseAudio Volume Control](https://freedesktop.org/software/pulseaudio/pavucontrol/) and [Audacity](https://www.audacityteam.org/)
+
+## Entering your credentials
+1. In the project directory, copy the *.env.example* file and create a file called *.env*
 
     ```
     cp .env.example .env
     ```
 
-2. Open the *.env* file and add the service credentials that you obtained in the previous step.
+2. Open the *.env* file and add the service credentials that you obtained in the previous step
 
-    Example *.env* file that configures the `apikey` and `url` for a Speech to Text service instance hosted in the US East region:
+    Example *.env* file:
 
     ```
     SPEECH_TO_TEXT_IAM_APIKEY=X4rbi8vwZmKpXfowaS3GAsA7vdy17Qh7km5D6EzKLHL2
     SPEECH_TO_TEXT_URL=https://gateway-wdc.watsonplatform.net/speech-to-text/api
+    GOOGLE_TRANSLATE_APIKEY=X4rbi8vwZmKpXfowaS3GAsA7vdy17Qh7km5D6EzKLHL2
     ```
 
 ## Running locally
@@ -51,51 +50,20 @@ You can view a [demo][demo_url] of this app.
     npm install
     ```
 
-1. Run the application
+2. Run the application
 
     ```
     npm start
     ```
 
-1. View the application in a browser at `localhost:3000`
+3. View the application in a browser at `localhost:3000`
 
-## Deploying to IBM Cloud as a Cloud Foundry Application
+## Using the application
+Enter your Zoom meeting ID upon first loading the website. You will then see your Zoom meeting window with a text box below, where the text translation will be displayed. Below the text box, select the speaker's language on the left and select the language you want to translate to on the right. When you want to start translating, click the "Start Transcribing / Translating" button and voilà!
 
-1. Login to IBM Cloud with the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli?topic=cloud-cli-getting-started#overview)
+**Important:** As Zoom's SDK does not provide the capability to obtain the meeting's live audio stream, this app transcribes and translates the meeting based on your microphone recording; thus, you need some way of playing the meeting audio through your microphone. The easiest way to accomplish this without any external software would be to connect your audio output to an external speaker, which your microphone can then record. Otherwise, you would need to follow some simple additional steps. If you are on Windows or Mac OS, [use VB-Cable](https://www.howtogeek.com/364369/how-to-record-your-pcs-audio-with-vb-cable/); if you are on Linux, follow [these instructions](https://www.kirsle.net/redirect-audio-out-to-mic-in-linux).
 
-    ```
-    ibmcloud login
-    ```
+## Acknowledgments
+This project uses IBM's [Speech to Text demo](https://github.com/watson-developer-cloud/speech-to-text-nodejs) as starter code. All modifications are clearly denoted *Modified* or *Created* at the top of relevant files, in compliance with the Apache-2.0 License.
 
-1. Target a Cloud Foundry organization and space.
-
-    ```
-    ibmcloud target --cf
-    ```
-
-1. Edit the *manifest.yml* file. Change the **name** field to something unique. For example, `- name: my-app-name`.
-1. Deploy the application
-
-    ```
-    ibmcloud app push
-    ```
-
-1. View the application online at the app URL, for example: https://my-app-name.mybluemix.net
-
-
-## License
-
-  This sample code is licensed under Apache 2.0.
-
-## Contributing
-
-  See [CONTRIBUTING](./CONTRIBUTING.md).
-
-## Open Source @ IBM
-  Find more open source projects on the [IBM Github Page](http://ibm.github.io/)
-
-
-[service_url]: https://www.ibm.com/cloud/watson-speech-to-text
-[docs]: https://cloud.ibm.com/apidocs/speech-to-text
-[sign_up]: https://cloud.ibm.com/registration/?target=/catalog/services/speech-to-text/
-[demo_url]: https://speech-to-text-demo.ng.bluemix.net
+Thank you to the staff of [HackThis](https://hackthis.hackillinois.org/) for organizing this great event; I had a lot of fun working on this project!

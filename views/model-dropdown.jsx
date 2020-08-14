@@ -1,3 +1,7 @@
+/**
+ * Modified by Rem Yang, Aug 12 2020
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import SpeechToText from 'watson-speech/speech-to-text';
@@ -18,6 +22,7 @@ export class ModelDropdown extends Component {
     this.state = { models: cachedModels }
   }
 
+  /*
   componentDidMount() {
     if (this.props.token) {
       this.fetchModels(this.props.token);
@@ -29,6 +34,7 @@ export class ModelDropdown extends Component {
       this.fetchModels(nextProps.token);
     }
   }
+  */
 
   fetchModels(token) {
     SpeechToText.getModels({ token }).then(models => this.setState({ models }))
@@ -47,13 +53,16 @@ export class ModelDropdown extends Component {
     const { model } = this.props;
     const options = models
       .sort((a, b) => a.description > b.description)
-      .map(m => (
-        <option value={m.name} key={m.name}>{m.description.replace(/\.$/, '')}
-          {' '}
-          {betaModels.some(b => b === m.name) ? '(Beta)' : ''}
-          {' '}
-          ({m.rate / 1000}KHz)
-        </option>));
+      .map(m => {
+        if (m.description.indexOf('broadband') != -1) {
+          return (
+            <option value={m.name} key={m.name}>{m.description.replace(/\.$/, '').replace('broadband model', '')}
+              {' '}
+              {betaModels.some(b => b === m.name) ? '(Beta)' : ''}
+            </option>
+          );
+        }
+      });
 
     return (
       <select

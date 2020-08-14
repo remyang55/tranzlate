@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * Modified by Rem Yang, Aug 13 2020
+ */
+
 const express = require('express');
 
 const app = express();
@@ -28,6 +32,7 @@ const tokenManager = new IamTokenManager({
   apikey: process.env.SPEECH_TO_TEXT_IAM_APIKEY || '<iam_apikey>',
 });
 
+const googleTranslateApiKey = process.env.GOOGLE_TRANSLATE_APIKEY;
 
 app.get('/', (req, res) => res.render('index'));
 
@@ -38,6 +43,7 @@ app.get('/api/v1/credentials', async (req, res, next) => {
     res.json({
       accessToken,
       serviceUrl,
+      googleTranslateApiKey
     });
   } catch (err) {
     next(err);
