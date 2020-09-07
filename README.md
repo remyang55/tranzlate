@@ -1,4 +1,7 @@
 # :jp::us::fr: Tranzlate: The Zoom Translator :cn::es::de:
+Click image below to watch demo video:  
+[![](http://img.youtube.com/vi/QOZ86WaqPQU/0.jpg)](http://www.youtube.com/watch?v=QOZ86WaqPQU "")  
+
 Currently, many classes, meetings, talks, and academic conferences (CVPR and PLDI this summer are two I'm aware of) around the world are being conducted online via Zoom due to the COVID-19 pandemic. Previously, people around the world would have had to travel for many of these events, but they now have access to these resources due to their virtual nature. 
 A major barrier, however, is language. For instance, a person from the U.S. may have always wanted to attend an annual French conference. Yet, even though it's now conducted on Zoom, that person still cannot attend because he/she does not understand French. This is where Tranzlate comes in.
 The user interface is minimalistic, with a Zoom meeting screen on top and the translated text on the bottom. It is also easy to use: simply enter your meeting ID, select the speaker's language and the language you'd like to translate to, and you are all set.
